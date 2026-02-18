@@ -1,60 +1,121 @@
 package com.quantity;
 
 public class App {
+	    // FEET CLASS
+	    public static class Feet {
 
-    // Inner class representing Feet measurement
-    public static class Feet {
+	        private final double value;
 
-        private final double value;   // immutable value
+	        public Feet(double value) {
+	            this.value = value;
+	        }
 
-        // Constructor
-        public Feet(double value) {
-            this.value = value;
-        }
+	        public double getValue() {
+	            return value;
+	        }
 
-        public double getValue() {
-            return value;
-        }
+	        @Override
+	        public boolean equals(Object obj) {
 
-        // Override equals method
-        @Override
-        public boolean equals(Object obj) {
+	            // Same reference
+	            if (this == obj)
+	                return true;
 
-            // 1. Same reference check (Reflexive)
-            if (this == obj) {
-                return true;
-            }
+	            // Null check
+	            if (obj == null)
+	                return false;
 
-            // 2. Null check
-            if (obj == null) {
-                return false;
-            }
+	            // Type check
+	            if (getClass() != obj.getClass())
+	                return false;
 
-            // 3. Type check
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
+	            // Cast
+	            Feet other = (Feet) obj;
 
-            // 4. Cast safely
-            Feet other = (Feet) obj;
+	            // Compare double safely
+	            return Double.compare(this.value, other.value) == 0;
+	        }
 
-            // 5. Compare using Double.compare (NOT ==)
-            return Double.compare(this.value, other.value) == 0;
-        }
+	        @Override
+	        public int hashCode() {
+	            return Double.hashCode(value);
+	        }
+	    }
 
-        // Good practice: override hashCode whenever equals is overridden
-        @Override
-        public int hashCode() {
-            return Double.hashCode(value);
-        }
-    }
 
-    // Main method to test manually
-    public static void main(String[] args) {
+	    // INCHES CLASS
+	    public static class Inches {
 
-        Feet first = new Feet(1.0);
-        Feet second = new Feet(1.0);
+	        private final double value;
 
-        System.out.println("Are both measurements equal? " + first.equals(second));
-    }
-}
+	        public Inches(double value) {
+	            this.value = value;
+	        }
+
+	        public double getValue() {
+	            return value;
+	        }
+
+	        @Override
+	        public boolean equals(Object obj) {
+
+	            // Same reference
+	            if (this == obj)
+	                return true;
+
+	            // Null check
+	            if (obj == null)
+	                return false;
+
+	            // Type check
+	            if (getClass() != obj.getClass())
+	                return false;
+
+	            // Cast
+	            Inches other = (Inches) obj;
+
+	            // Compare safely
+	            return Double.compare(this.value, other.value) == 0;
+	        }
+
+	        @Override
+	        public int hashCode() {
+	            return Double.hashCode(value);
+	        }
+	    }
+
+
+	    //STATIC METHODS
+
+	    // Feet equality check
+	    public static boolean compareFeet(double value1, double value2) {
+
+	        Feet f1 = new Feet(value1);
+	        Feet f2 = new Feet(value2);
+
+	        return f1.equals(f2);
+	    }
+
+
+	    // Inches equality check
+	    public static boolean compareInches(double value1, double value2) {
+
+	        Inches i1 = new Inches(value1);
+	        Inches i2 = new Inches(value2);
+
+	        return i1.equals(i2);
+	    }
+
+
+	    // MAIN METHOD
+	    public static void main(String[] args) {
+
+	        // Feet comparison
+	        boolean feetResult = compareFeet(1.0, 1.0);
+	        System.out.println("Feet comparison result: " + feetResult);
+
+	        // Inches comparison
+	        boolean inchesResult = compareInches(1.0, 1.0);
+	        System.out.println("Inches comparison result: " + inchesResult);
+	    }
+	}
