@@ -1,117 +1,73 @@
 package com.quantity;
 
-import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 public class AppTest {
 
-    // FEET TESTS
-
-    // Test same value equality
     @Test
-    void testFeetEquality_SameValue() {
-
-        boolean result = App.compareFeet(1.0, 1.0);
-
-        assertTrue(result);
+    void testEquality_FeetToFeet_SameValue() {
+        App.QuantityLength q1 = new App.QuantityLength(1.0, App.LengthUnit.FEET);
+        App.QuantityLength q2 = new App.QuantityLength(1.0, App.LengthUnit.FEET);
+        assertEquals(q1, q2);
     }
 
-
-    // Test different values inequality
     @Test
-    void testFeetEquality_DifferentValue() {
-
-        boolean result = App.compareFeet(1.0, 2.0);
-
-        assertFalse(result);
+    void testEquality_InchToInch_SameValue() {
+        App.QuantityLength q1 = new App.QuantityLength(1.0, App.LengthUnit.INCH);
+        App.QuantityLength q2 = new App.QuantityLength(1.0, App.LengthUnit.INCH);
+        assertEquals(q1, q2);
     }
 
-
-    // Test same reference (reflexive property)
     @Test
-    void testFeetEquality_SameReference() {
-
-        App.Feet feet =
-                new App.Feet(1.0);
-
-        assertTrue(feet.equals(feet));
+    void testEquality_NullComparison_CrossUnit() {
+        App.QuantityLength q1 = new App.QuantityLength(1.0, App.LengthUnit.FEET);
+        App.QuantityLength q2 = new App.QuantityLength(12.0, App.LengthUnit.INCH);
+        assertEquals(q1, q2);
     }
 
-
-    // Test null comparison
     @Test
-    void testFeetEquality_NullComparison() {
-
-        App.Feet feet =
-                new App.Feet(1.0);
-
-        assertFalse(feet.equals(null));
+    void testEquality_InchToFeet_EquivalentValue() {
+        App.QuantityLength q1 = new App.QuantityLength(12.0, App.LengthUnit.INCH);
+        App.QuantityLength q2 = new App.QuantityLength(1.0, App.LengthUnit.FEET);
+        assertEquals(q1, q2);
     }
 
-
-    // Test type safety
     @Test
-    void testFeetEquality_NonNumericInput() {
-
-        App.Feet feet =
-                new App.Feet(1.0);
-
-        assertFalse(feet.equals("abc"));
+    void testEquality_FeetToFeet_DifferentValue() {
+        App.QuantityLength q1 = new App.QuantityLength(1.0, App.LengthUnit.FEET);
+        App.QuantityLength q2 = new App.QuantityLength(2.0, App.LengthUnit.FEET);
+        assertNotEquals(q1, q2);
     }
 
-
-    //  INCHES TESTS 
-
-    // Test same value equality
     @Test
-    void testInchesEquality_SameValue() {
-
-        boolean result = App.compareInches(1.0, 1.0);
-
-        assertTrue(result);
+    void testEquality_InchToInch_DifferentValue() {
+        App.QuantityLength q1 = new App.QuantityLength(1.0, App.LengthUnit.INCH);
+        App.QuantityLength q2 = new App.QuantityLength(2.0, App.LengthUnit.INCH);
+        assertNotEquals(q1, q2);
     }
 
-
-    // Test different value inequality
     @Test
-    void testInchesEquality_DifferentValue() {
-
-        boolean result = App.compareInches(1.0, 2.0);
-
-        assertFalse(result);
+    void testEquality_InvalidUnit() {
+        assertThrows(IllegalArgumentException.class, () ->
+            new App.QuantityLength(1.0, null));
     }
 
-
-    // Test same reference
     @Test
-    void testInchesEquality_SameReference() {
-
-        App.Inches inches =
-                new App.Inches(1.0);
-
-        assertTrue(inches.equals(inches));
+    void testEquality_NullUnit() {
+        assertThrows(IllegalArgumentException.class, () ->
+            new App.QuantityLength(2.0, null));
     }
 
-
-    // Test null comparison
     @Test
-    void testInchesEquality_NullComparison() {
-
-        App.Inches inches =
-                new App.Inches(1.0);
-
-        assertFalse(inches.equals(null));
+    void testEquality_SameReference() {
+        App.QuantityLength q = new App.QuantityLength(1.0, App.LengthUnit.FEET);
+        assertEquals(q, q);
     }
 
-
-    // Test type safety
     @Test
-    void testInchesEquality_NonNumericInput() {
-
-        App.Inches inches =
-                new App.Inches(1.0);
-
-        assertFalse(inches.equals("xyz"));
+    void testEquality_NullComparison() {
+        App.QuantityLength q = new App.QuantityLength(1.0, App.LengthUnit.FEET);
+        assertNotEquals(q, null);
     }
-
 }
