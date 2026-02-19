@@ -4,8 +4,10 @@ public class App {
 
     // Enum for supported units
     public enum LengthUnit {
-        FEET(1.0),       // Base unit: feet
-        INCH(1.0 / 12);  // 1 inch = 1/12 feet
+        FEET(1.0),                 // base unit: feet
+        INCH(1.0 / 12),            // 1 inch = 1/12 feet
+        YARD(3.0),                 // 1 yard = 3 feet
+        CENTIMETER((0.393701 / 12)); // 1 cm = 0.393701 inch = 0.393701/12 feet
 
         private final double toFeetConversion;
 
@@ -20,7 +22,6 @@ public class App {
 
     // Generic QuantityLength class
     public static class QuantityLength {
-
         private final double value;
         private final LengthUnit unit;
 
@@ -35,7 +36,6 @@ public class App {
             this.unit = unit;
         }
 
-        // Convert to base unit (feet)
         private double toBaseUnit() {
             return unit.toFeet(value);
         }
@@ -56,51 +56,55 @@ public class App {
         }
     }
 
-    // Main method to demonstrate all test cases
     public static void main(String[] args) {
+        System.out.println("=== UC4 Extended Unit Demonstration ===\n");
 
-        System.out.println("=== UC3 QuantityLength Demonstration ===\n");
+        // Basic yard and centimeter comparisons
+        QuantityLength yard1 = new QuantityLength(1.0, LengthUnit.YARD);
+        QuantityLength feet1 = new QuantityLength(3.0, LengthUnit.FEET);
+        QuantityLength inch1 = new QuantityLength(36.0, LengthUnit.INCH);
+        QuantityLength cm1 = new QuantityLength(1.0, LengthUnit.CENTIMETER);
+        QuantityLength inchFromCm = new QuantityLength(0.393701, LengthUnit.INCH);
 
-        // 1. Feet to Feet same value
-        QuantityLength feet1 = new QuantityLength(1.0, LengthUnit.FEET);
-        QuantityLength feet2 = new QuantityLength(1.0, LengthUnit.FEET);
-        System.out.println("Feet to Feet same value: " + feet1.equals(feet2));
+        System.out.println("Yard to Feet equivalent: " + yard1.equals(feet1));        // true
+        System.out.println("Yard to Inch equivalent: " + yard1.equals(inch1));        // true
+        System.out.println("Centimeter to Inch equivalent: " + cm1.equals(inchFromCm)); // true
 
-        // 2. Inch to Inch same value
-        QuantityLength inch1 = new QuantityLength(1.0, LengthUnit.INCH);
-        QuantityLength inch2 = new QuantityLength(1.0, LengthUnit.INCH);
-        System.out.println("Inch to Inch same value: " + inch1.equals(inch2));
+        // Same-unit checks
+        QuantityLength yard2 = new QuantityLength(2.0, LengthUnit.YARD);
+        QuantityLength yard3 = new QuantityLength(2.0, LengthUnit.YARD);
+        System.out.println("Yard to Yard same value: " + yard2.equals(yard3));        // true
 
-        // 3. Cross-unit equality: 1 foot = 12 inches
-        QuantityLength feet3 = new QuantityLength(1.0, LengthUnit.FEET);
-        QuantityLength inch3 = new QuantityLength(12.0, LengthUnit.INCH);
-        System.out.println("Feet to Inch equivalent: " + feet3.equals(inch3));
+        QuantityLength cm2 = new QuantityLength(2.0, LengthUnit.CENTIMETER);
+        QuantityLength cm3 = new QuantityLength(2.0, LengthUnit.CENTIMETER);
+        System.out.println("Centimeter to Centimeter same value: " + cm2.equals(cm3)); // true
 
-        // 4. Inch to Feet equivalent (symmetry)
-        QuantityLength inch4 = new QuantityLength(12.0, LengthUnit.INCH);
-        QuantityLength feet4 = new QuantityLength(1.0, LengthUnit.FEET);
-        System.out.println("Inch to Feet equivalent: " + inch4.equals(feet4));
+        // Different value checks
+        QuantityLength yardDiff = new QuantityLength(1.0, LengthUnit.YARD);
+        QuantityLength feetDiff = new QuantityLength(2.0, LengthUnit.FEET);
+        System.out.println("Yard to Feet different value: " + yardDiff.equals(feetDiff)); // false
 
-        // 5. Feet to Feet different value
-        QuantityLength feet5 = new QuantityLength(2.0, LengthUnit.FEET);
-        System.out.println("Feet to Feet different value: " + feet1.equals(feet5));
+        QuantityLength cmDiff = new QuantityLength(1.0, LengthUnit.CENTIMETER);
+        QuantityLength feetDiff2 = new QuantityLength(1.0, LengthUnit.FEET);
+        System.out.println("Centimeter to Feet different value: " + cmDiff.equals(feetDiff2)); // false
 
-        // 6. Inch to Inch different value
-        QuantityLength inch5 = new QuantityLength(2.0, LengthUnit.INCH);
-        System.out.println("Inch to Inch different value: " + inch1.equals(inch5));
+        // Transitive property
+        QuantityLength yardTrans = new QuantityLength(2.0, LengthUnit.YARD);
+        QuantityLength feetTrans = new QuantityLength(6.0, LengthUnit.FEET);
+        QuantityLength inchTrans = new QuantityLength(72.0, LengthUnit.INCH);
+        boolean transitive = yardTrans.equals(feetTrans) && feetTrans.equals(inchTrans);
+        System.out.println("Multi-unit transitive property: " + transitive); // true
 
-        // 7. Same reference
-        System.out.println("Same reference check: " + feet1.equals(feet1));
+        // Null and same reference
+        System.out.println("Yard same reference: " + yard1.equals(yard1));
+        System.out.println("Yard null comparison: " + yard1.equals(null));
+        System.out.println("Centimeter same reference: " + cm1.equals(cm1));
+        System.out.println("Centimeter null comparison: " + cm1.equals(null));
 
-        // 8. Null comparison
-        System.out.println("Null comparison: " + feet1.equals(null));
-
-        // 9. Invalid unit example (commented to prevent runtime error)
+        // Invalid or NaN (commented to avoid crash)
         // QuantityLength invalid = new QuantityLength(1.0, null);
-
-        // 10. NaN value example (commented to prevent runtime error)
         // QuantityLength nanValue = new QuantityLength(Double.NaN, LengthUnit.FEET);
 
-        System.out.println("\nDemonstration Complete");
+        System.out.println("\nUC4 Demonstration Complete");
     }
 }
