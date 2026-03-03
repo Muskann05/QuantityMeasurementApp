@@ -2,13 +2,13 @@ package com.quantity;
 
 import java.util.Objects;
 
-public class QuantityLength {
+public final class QuantityWeight {
 
     private final double value;
-    private final LengthUnit unit;
-    private static final double EPSILON = 0.0001;
+    private final WeightUnit unit;
+    private static final double EPSILON = 1e-6;
 
-    public QuantityLength(double value, LengthUnit unit) {
+    public QuantityWeight(double value, WeightUnit unit) {
         if (unit == null)
             throw new IllegalArgumentException("Unit cannot be null");
 
@@ -23,31 +23,41 @@ public class QuantityLength {
         return value;
     }
 
-    public LengthUnit getUnit() {
+    public WeightUnit getUnit() {
         return unit;
     }
 
-    // UC5 Conversion
-    public QuantityLength convertTo(LengthUnit targetUnit) {
-        double baseValue = unit.convertToBaseUnit(this.value);
-        double convertedValue = targetUnit.convertFromBaseUnit(baseValue);
-        return new QuantityLength(Math.round(convertedValue * 100.0) / 100.0, targetUnit);
+    // Conversion
+    public QuantityWeight convertTo(WeightUnit targetUnit) {
+        if (targetUnit == null)
+            throw new IllegalArgumentException("Target unit cannot be null");
+
+        double base = unit.convertToBaseUnit(value);
+        double converted = targetUnit.convertFromBaseUnit(base);
+
+        return new QuantityWeight(converted, targetUnit);
     }
 
-    // UC6 + UC7 Addition with Target Unit
-    public QuantityLength add(QuantityLength other, LengthUnit targetUnit) {
+    // Addition (default → first operand unit)
+    public QuantityWeight add(QuantityWeight other) {
+        return add(other, this.unit);
+    }
+
+    // Addition (explicit target unit)
+    public QuantityWeight add(QuantityWeight other, WeightUnit targetUnit) {
         double base1 = this.unit.convertToBaseUnit(this.value);
         double base2 = other.unit.convertToBaseUnit(other.value);
         double sumBase = base1 + base2;
         double result = targetUnit.convertFromBaseUnit(sumBase);
-        return new QuantityLength(Math.round(result * 100.0) / 100.0, targetUnit);
+        return new QuantityWeight(result, targetUnit);
     }
 
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (!(obj instanceof QuantityLength)) return false;
-        QuantityLength other = (QuantityLength) obj;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        QuantityWeight other = (QuantityWeight) obj;
 
         double base1 = this.unit.convertToBaseUnit(this.value);
         double base2 = other.unit.convertToBaseUnit(other.value);
