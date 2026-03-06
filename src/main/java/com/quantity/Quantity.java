@@ -1,20 +1,16 @@
 package com.quantity;
 
-import java.util.Objects;
-
-public final class Quantity<U extends IMeasurable> {
+public class Quantity<U extends IMeasurable> {
 
     private final double value;
     private final U unit;
-
-    private static final double EPSILON = 0.0001;
 
     public Quantity(double value, U unit) {
         if (unit == null)
             throw new IllegalArgumentException("Unit cannot be null");
 
         if (Double.isNaN(value) || Double.isInfinite(value))
-            throw new IllegalArgumentException("Invalid value");
+            throw new IllegalArgumentException("Invalid numeric value");
 
         this.value = value;
         this.unit = unit;
@@ -28,67 +24,63 @@ public final class Quantity<U extends IMeasurable> {
         return unit;
     }
 
-    //EQUALS
+    private void validateOperand(Quantity<U> other) {
+        if (other == null)
+            throw new IllegalArgumentException("Quantity cannot be null");
 
-    @Override
-    public boolean equals(Object obj) {
-
-        if (this == obj)
-            return true;
-
-        if (obj == null || getClass() != obj.getClass())
-            return false;
-
-        Quantity<?> other = (Quantity<?>) obj;
-
-        // Prevent cross-category comparison
-        if (!unit.getClass().equals(other.unit.getClass()))
-            return false;
-
-        double base1 = unit.convertToBaseUnit(this.value);
-        double base2 = other.unit.convertToBaseUnit(other.value);
-
-        return Math.abs(base1 - base2) < EPSILON;
-    }
-
-    @Override
-    public int hashCode() {
-        double base = unit.convertToBaseUnit(value);
-        return Objects.hash(base, unit.getClass());
-    }
-
-    // CONVERT 
-
-    public Quantity<U> convertTo(U targetUnit) {
-        double baseValue = unit.convertToBaseUnit(value);
-        double converted = targetUnit.convertFromBaseUnit(baseValue);
-
-        return new Quantity<>(round(converted), targetUnit);
-    }
-
-    // ADD
-
-    public Quantity<U> add(Quantity<U> other) {
-        return add(other, this.unit);
-    }
-
-    public Quantity<U> add(Quantity<U> other, U targetUnit) {
-
-        if (!unit.getClass().equals(other.unit.getClass()))
-            throw new IllegalArgumentException("Cannot add different categories");
-
-        double base1 = unit.convertToBaseUnit(this.value);
-        double base2 = other.unit.convertToBaseUnit(other.value);
-
-        double sumBase = base1 + base2;
-
-        double result = targetUnit.convertFromBaseUnit(sumBase);
-
-        return new Quantity<>(round(result), targetUnit);
+        if (!this.unit.getClass().equals(other.unit.getClass()))
+            throw new IllegalArgumentException("Different measurement categories");
     }
 
     private double round(double value) {
         return Math.round(value * 100.0) / 100.0;
+    }
+
+    // SUBTRACTION (implicit target unit)
+    public Quantity<U> subtract(Quantity<U> other) {
+
+        validateOperand(other);
+
+        double base1 = unit.convertToBaseUnit(value);
+        double base2 = other.unit.convertToBaseUnit(other.value);
+
+        double resultBase = base1 - base2;
+
+        double result = unit.convertFromBaseUnit(resultBase);
+
+        return new Quantity<>(round(result), unit);
+    }
+
+    // SUBTRACTION (explicit target unit)
+    public Quantity<U> subtract(Quantity<U> other, U targetUnit) {
+
+        validateOperand(other);
+
+        if (targetUnit == null)
+            throw new IllegalArgumentException("Target unit cannot be null");
+
+        double base1 = unit.convertToBaseUnit(value);
+        double base2 = other.unit.convertToBaseUnit(other.value);
+
+        double resultBase = base1 - base2;
+
+        double result = targetUnit.convertFromBaseUnit(resultBase);
+
+        return new Quantity<>(round(result), targetUnit);
+    }
+
+    // DIVISION
+    public double divide(Quantity<U> other) {
+
+        validateOperand(other);
+
+        double base1 = unit.convertToBaseUnit(value);
+        double base2 = other.unit.convertToBaseUnit(other.value);
+
+        if (base2 == 0)
+            throw new ArithmeticException("Division by zero");
+
+        return base1 / base2;
     }
 
     @Override
