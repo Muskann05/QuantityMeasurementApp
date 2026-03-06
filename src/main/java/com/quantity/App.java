@@ -4,28 +4,28 @@ public class App {
 
     public static void main(String[] args) {
 
-        Quantity<LengthUnit> q1 =
-                new Quantity<>(1.0, LengthUnit.FEET);
+        Quantity<LengthUnit> length =
+                new Quantity<>(1, LengthUnit.FEET);
 
-        Quantity<LengthUnit> q2 =
-                new Quantity<>(12.0, LengthUnit.INCHES);
+        Quantity<LengthUnit> inch =
+                new Quantity<>(12, LengthUnit.INCH);
 
-        System.out.println(q1.add(q2));
+        System.out.println("Length Equality: " + length.equals(inch));
 
-        Quantity<LengthUnit> q3 =
-                new Quantity<>(10.0, LengthUnit.FEET);
+        Quantity<WeightUnit> kg =
+                new Quantity<>(1, WeightUnit.KILOGRAM);
 
-        Quantity<LengthUnit> q4 =
-                new Quantity<>(6.0, LengthUnit.INCHES);
+        Quantity<WeightUnit> gram =
+                new Quantity<>(1000, WeightUnit.GRAM);
 
-        System.out.println(q3.subtract(q4));
+        System.out.println("Weight Equality: " + kg.equals(gram));
 
-        Quantity<LengthUnit> q5 =
-                new Quantity<>(10.0, LengthUnit.FEET);
+        Quantity<TemperatureUnit> temp =
+                new Quantity<>(0, TemperatureUnit.CELSIUS);
 
-        Quantity<LengthUnit> q6 =
-                new Quantity<>(2.0, LengthUnit.FEET);
+        Quantity<TemperatureUnit> fahr =
+                new Quantity<>(32, TemperatureUnit.FAHRENHEIT);
 
-        System.out.println(q5.divide(q6));
+        System.out.println("Temperature Equality: " + temp.equals(fahr));
     }
 }
