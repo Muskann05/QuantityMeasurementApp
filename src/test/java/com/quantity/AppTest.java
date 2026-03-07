@@ -1,251 +1,154 @@
 package com.quantity;
 
+import com.quantity.controller.QuantityMeasurementController;
+import com.quantity.dto.QuantityDTO;
+import com.quantity.repository.QuantityMeasurementCacheRepository;
+import com.quantity.service.IQuantityMeasurementService;
+import com.quantity.service.QuantityMeasurementServiceImpl;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class AppTest {
 
-    private static final double EPSILON = 0.001;
+    private IQuantityMeasurementService service;
+    private QuantityMeasurementController controller;
 
-    // Equality Tests
+    @BeforeEach
+    void setUp() {
+
+        service = new QuantityMeasurementServiceImpl(
+                QuantityMeasurementCacheRepository.getInstance());
+
+        controller = new QuantityMeasurementController(service);
+    }
+
+    // Entity / DTO Tests
+
     @Test
-    void testTemperatureEquality_CelsiusToCelsius_SameValue() {
-        Quantity<TemperatureUnit> t1 = new Quantity<>(0.0, TemperatureUnit.CELSIUS);
-        Quantity<TemperatureUnit> t2 = new Quantity<>(0.0, TemperatureUnit.CELSIUS);
+    void testQuantityDTO_Creation() {
 
-        assertTrue(t1.equals(t2));
+        QuantityDTO dto = new QuantityDTO(10, "FEET");
+
+        assertEquals(10, dto.getValue());
+        assertEquals("FEET", dto.getUnit());
+    }
+
+    // Service Layer Tests
+    @Test
+    void testService_CompareEquality_SameUnit() {
+
+        QuantityDTO q1 = new QuantityDTO(10, "FEET");
+        QuantityDTO q2 = new QuantityDTO(10, "FEET");
+
+        assertTrue(service.compare(q1, q2));
     }
 
     @Test
-    void testTemperatureEquality_FahrenheitToFahrenheit_SameValue() {
-        Quantity<TemperatureUnit> t1 = new Quantity<>(32.0, TemperatureUnit.FAHRENHEIT);
-        Quantity<TemperatureUnit> t2 = new Quantity<>(32.0, TemperatureUnit.FAHRENHEIT);
+    void testService_CompareEquality_DifferentUnit() {
 
-        assertTrue(t1.equals(t2));
+        QuantityDTO q1 = new QuantityDTO(1, "FEET");
+        QuantityDTO q2 = new QuantityDTO(12, "INCH");
+
+        assertFalse(service.compare(q1, q2));
     }
 
     @Test
-    void testTemperatureEquality_CelsiusToFahrenheit_0Celsius32Fahrenheit() {
+    void testService_Convert() {
 
-        Quantity<TemperatureUnit> celsius =
-                new Quantity<>(0.0, TemperatureUnit.CELSIUS);
+        QuantityDTO source = new QuantityDTO(1, "FEET");
 
-        Quantity<TemperatureUnit> fahrenheit =
-                new Quantity<>(32.0, TemperatureUnit.FAHRENHEIT);
+        QuantityDTO result = service.convert(source, "INCH");
 
-        assertTrue(celsius.equals(fahrenheit));
+        assertEquals("INCH", result.getUnit());
     }
 
     @Test
-    void testTemperatureEquality_CelsiusToFahrenheit_100Celsius212Fahrenheit() {
+    void testService_Addition() {
 
-        Quantity<TemperatureUnit> celsius =
-                new Quantity<>(100.0, TemperatureUnit.CELSIUS);
+        QuantityDTO q1 = new QuantityDTO(5, "FEET");
+        QuantityDTO q2 = new QuantityDTO(5, "FEET");
 
-        Quantity<TemperatureUnit> fahrenheit =
-                new Quantity<>(212.0, TemperatureUnit.FAHRENHEIT);
+        QuantityDTO result = service.add(q1, q2);
 
-        assertTrue(celsius.equals(fahrenheit));
+        assertEquals(10, result.getValue());
+        assertEquals("FEET", result.getUnit());
     }
 
     @Test
-    void testTemperatureEquality_Negative40Equal() {
+    void testService_Subtraction() {
 
-        Quantity<TemperatureUnit> celsius =
-                new Quantity<>(-40.0, TemperatureUnit.CELSIUS);
+        QuantityDTO q1 = new QuantityDTO(10, "FEET");
+        QuantityDTO q2 = new QuantityDTO(5, "FEET");
 
-        Quantity<TemperatureUnit> fahrenheit =
-                new Quantity<>(-40.0, TemperatureUnit.FAHRENHEIT);
+        QuantityDTO result = service.subtract(q1, q2);
 
-        assertTrue(celsius.equals(fahrenheit));
-    }
-
-    // Conversion Tests
-
-    @Test
-    void testTemperatureConversion_CelsiusToFahrenheit() {
-
-        Quantity<TemperatureUnit> celsius =
-                new Quantity<>(100.0, TemperatureUnit.CELSIUS);
-
-        Quantity<TemperatureUnit> result =
-                celsius.convertTo(TemperatureUnit.FAHRENHEIT);
-
-        assertEquals(212.0, result.getValue(), EPSILON);
+        assertEquals(5, result.getValue());
     }
 
     @Test
-    void testTemperatureConversion_FahrenheitToCelsius() {
+    void testService_Division() {
 
-        Quantity<TemperatureUnit> fahrenheit =
-                new Quantity<>(32.0, TemperatureUnit.FAHRENHEIT);
+        QuantityDTO q1 = new QuantityDTO(10, "FEET");
+        QuantityDTO q2 = new QuantityDTO(2, "FEET");
 
-        Quantity<TemperatureUnit> result =
-                fahrenheit.convertTo(TemperatureUnit.CELSIUS);
+        double result = service.divide(q1, q2);
 
-        assertEquals(0.0, result.getValue(), EPSILON);
+        assertEquals(5, result);
     }
 
     @Test
-    void testTemperatureConversion_CelsiusToKelvin() {
+    void testService_Division_ByZero() {
 
-        Quantity<TemperatureUnit> celsius =
-                new Quantity<>(0.0, TemperatureUnit.CELSIUS);
+        QuantityDTO q1 = new QuantityDTO(10, "FEET");
+        QuantityDTO q2 = new QuantityDTO(0, "FEET");
 
-        Quantity<TemperatureUnit> result =
-                celsius.convertTo(TemperatureUnit.KELVIN);
+        assertThrows(RuntimeException.class,
+                () -> service.divide(q1, q2));
+    }
 
-        assertEquals(273.15, result.getValue(), EPSILON);
+    // Controller Layer Tests
+
+    @Test
+    void testController_CompareOperation() {
+
+        QuantityDTO q1 = new QuantityDTO(10, "FEET");
+        QuantityDTO q2 = new QuantityDTO(10, "FEET");
+
+        assertDoesNotThrow(() ->
+                controller.performComparison(q1, q2));
     }
 
     @Test
-    void testTemperatureConversion_KelvinToCelsius() {
+    void testController_AdditionOperation() {
 
-        Quantity<TemperatureUnit> kelvin =
-                new Quantity<>(273.15, TemperatureUnit.KELVIN);
+        QuantityDTO q1 = new QuantityDTO(5, "FEET");
+        QuantityDTO q2 = new QuantityDTO(5, "FEET");
 
-        Quantity<TemperatureUnit> result =
-                kelvin.convertTo(TemperatureUnit.CELSIUS);
-
-        assertEquals(0.0, result.getValue(), EPSILON);
+        assertDoesNotThrow(() ->
+                controller.performAddition(q1, q2));
     }
 
     @Test
-    void testTemperatureConversion_SameUnit() {
+    void testController_ConversionOperation() {
 
-        Quantity<TemperatureUnit> celsius =
-                new Quantity<>(50.0, TemperatureUnit.CELSIUS);
+        QuantityDTO q1 = new QuantityDTO(1, "FEET");
 
-        Quantity<TemperatureUnit> result =
-                celsius.convertTo(TemperatureUnit.CELSIUS);
-
-        assertEquals(50.0, result.getValue(), EPSILON);
+        assertDoesNotThrow(() ->
+                controller.performConversion(q1, "INCH"));
     }
 
-    // Edge Case Tests
-
+    // Integration Test
     @Test
-    void testAbsoluteZero() {
+    void testIntegration_EndToEnd_Addition() {
 
-        Quantity<TemperatureUnit> celsius =
-                new Quantity<>(-273.15, TemperatureUnit.CELSIUS);
+        QuantityDTO q1 = new QuantityDTO(10, "FEET");
+        QuantityDTO q2 = new QuantityDTO(20, "FEET");
 
-        Quantity<TemperatureUnit> kelvin =
-                new Quantity<>(0.0, TemperatureUnit.KELVIN);
+        QuantityDTO result = service.add(q1, q2);
 
-        assertTrue(celsius.equals(kelvin));
-    }
-
-    @Test
-    void testNegativeTemperatureConversion() {
-
-        Quantity<TemperatureUnit> celsius =
-                new Quantity<>(-20.0, TemperatureUnit.CELSIUS);
-
-        Quantity<TemperatureUnit> result =
-                celsius.convertTo(TemperatureUnit.FAHRENHEIT);
-
-        assertEquals(-4.0, result.getValue(), EPSILON);
-    }
-
-    // Unsupported Operation Tests
-
-    @Test
-    void testTemperatureUnsupportedOperation_Add() {
-
-        Quantity<TemperatureUnit> t1 =
-                new Quantity<>(100.0, TemperatureUnit.CELSIUS);
-
-        Quantity<TemperatureUnit> t2 =
-                new Quantity<>(50.0, TemperatureUnit.CELSIUS);
-
-        assertThrows(UnsupportedOperationException.class, () -> {
-            t1.add(t2);
-        });
-    }
-
-    @Test
-    void testTemperatureUnsupportedOperation_Subtract() {
-
-        Quantity<TemperatureUnit> t1 =
-                new Quantity<>(100.0, TemperatureUnit.CELSIUS);
-
-        Quantity<TemperatureUnit> t2 =
-                new Quantity<>(50.0, TemperatureUnit.CELSIUS);
-
-        assertThrows(UnsupportedOperationException.class, () -> {
-            t1.subtract(t2);
-        });
-    }
-
-    @Test
-    void testTemperatureUnsupportedOperation_Divide() {
-
-        Quantity<TemperatureUnit> t1 =
-                new Quantity<>(100.0, TemperatureUnit.CELSIUS);
-
-        Quantity<TemperatureUnit> t2 =
-                new Quantity<>(50.0, TemperatureUnit.CELSIUS);
-
-        assertThrows(UnsupportedOperationException.class, () -> {
-            t1.divide(t2);
-        });
-    }
-
-    // Cross Category Tests
-
-    @Test
-    void testTemperatureVsLengthIncompatibility() {
-
-        Quantity<TemperatureUnit> temp =
-                new Quantity<>(100.0, TemperatureUnit.CELSIUS);
-
-        Quantity<LengthUnit> length =
-                new Quantity<>(100.0, LengthUnit.FEET);
-
-        assertFalse(temp.equals(length));
-    }
-
-    @Test
-    void testTemperatureVsWeightIncompatibility() {
-
-        Quantity<TemperatureUnit> temp =
-                new Quantity<>(50.0, TemperatureUnit.CELSIUS);
-
-        Quantity<WeightUnit> weight =
-                new Quantity<>(50.0, WeightUnit.KILOGRAM);
-
-        assertFalse(temp.equals(weight));
-    }
-
-    @Test
-    void testTemperatureVsVolumeIncompatibility() {
-
-        Quantity<TemperatureUnit> temp =
-                new Quantity<>(25.0, TemperatureUnit.CELSIUS);
-
-        Quantity<VolumeUnit> volume =
-                new Quantity<>(25.0, VolumeUnit.LITRE);
-
-        assertFalse(temp.equals(volume));
-    }
-
-    // Null Validation
-
-    @Test
-    void testTemperatureNullUnitValidation() {
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            new Quantity<>(100.0, null);
-        });
-    }
-
-    @Test
-    void testEqualsNull() {
-
-        Quantity<TemperatureUnit> temp =
-                new Quantity<>(100.0, TemperatureUnit.CELSIUS);
-
-        assertFalse(temp.equals(null));
+        assertEquals(30, result.getValue());
     }
 }
