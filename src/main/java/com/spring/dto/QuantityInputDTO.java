@@ -1,8 +1,8 @@
 package com.spring.dto;
 
-import lombok.Data;
+//import lombok.Data;
 
-@Data
+//@Data
 public class QuantityInputDTO {
 
     private QuantityDTO thisQuantityDTO;
