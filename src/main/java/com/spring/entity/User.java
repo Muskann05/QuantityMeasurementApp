@@ -13,8 +13,7 @@ public class User {
     private String name;
     private String email;
     private String password;
-    private String provider;
-    private String role;
+   
 
     // Constructors
     public User() {}
@@ -51,21 +50,5 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getProvider() {
-        return provider;
-    }
-
-    public void setProvider(String provider) {
-        this.provider = provider;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
     }
 }
