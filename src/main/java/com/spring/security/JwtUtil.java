@@ -12,7 +12,7 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private final String SECRET = "AbhayRajputSecurityKeyAbhayRajputSecurityKey"; // min 32 chars
+    private final String SECRET = "MuskanGuptaSecurityKeyMuskanGuptaSecurityKey"; // min 32 chars
 
     private Key getKey() {
         return Keys.hmacShaKeyFor(SECRET.getBytes());
