@@ -138,10 +138,10 @@ mvn test -Dtest=QuantityMeasurementAppTest
 
 | Category | Units |
 |----------|-------|
-| Length | `FEET`, `INCH`, `YARDS`, `CENTIMETER` |
+| Length | `FEET`, `INCHES`, `YARDS`, `CENTIMETER` |
 | Weight | `KILOGRAM`, `GRAM`, `POUND` |
 | Volume | `LITRE`, `MILLILITRE`, `GALLON` |
-| Temperature | `CELSIUS`, `FAHRENHEIT` *(comparison & conversion only)* |
+| Temperature | `CELSIUS`, `FAHRENHEIT`,`KELVIN`  |
 
 ---
 
