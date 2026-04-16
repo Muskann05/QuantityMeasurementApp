@@ -35,15 +35,15 @@ public class SecurityConfig {
 
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-				.authorizeHttpRequests(auth -> auth.requestMatchers("/api/v1/users/**").permitAll() // login/register
-						.requestMatchers("/oauth2/**").permitAll() // oauth endpoints
+				.authorizeHttpRequests(auth -> auth.requestMatchers("/api/v1/users/**").permitAll()
+						.requestMatchers("/oauth2/**").permitAll()
 						.anyRequest().authenticated())
 
-				// ✅ OAuth2 login config
+				//OAuth2 login config
 				.oauth2Login(oauth -> oauth.userInfoEndpoint(user -> user.userService(oauth2UserService))
 						.successHandler(successHandler).failureHandler(failureHandler));
 
-		// ✅ Add JWT filter
+		//Add JWT filter
 		http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();

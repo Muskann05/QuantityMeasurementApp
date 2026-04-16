@@ -31,7 +31,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 		String email = user.getAttribute("email");
 		String token = jwtUtil.generateToken(email);
 
-		// ✅ Return JSON response
+		//Return JSON response
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 

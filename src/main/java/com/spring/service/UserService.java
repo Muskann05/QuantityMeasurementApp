@@ -23,7 +23,7 @@ public class UserService {
     @Autowired
     private JwtUtil jwtUtil;
 
-    // ✅ REGISTER
+    //REGISTER
     public String register(RegisterDTO dto) {
 
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
@@ -34,7 +34,7 @@ public class UserService {
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
 
-        // 🔥 HASH PASSWORD HERE
+        //HASH PASSWORD HERE
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
 
         userRepository.save(user);
@@ -42,7 +42,7 @@ public class UserService {
         return "User Registered Successfully";
     }
 
-    // ✅ LOGIN
+    //LOGIN
     public String login(LoginDTO dto) {
 
         User user = userRepository.findByEmail(dto.getEmail()).orElse(null);

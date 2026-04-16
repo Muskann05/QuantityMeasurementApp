@@ -18,7 +18,7 @@ public class QuantityMeasurementServiceImpl implements IQuantityMeasurementServi
     @Autowired
     private QuantityMeasurementRepository repository;
 
-    // ================= COMMON FIELD SETTER =================
+    // COMMON FIELD SETTER
     private void setCommonFields(QuantityMeasurementEntity entity, QuantityInputDTO input) {
         entity.setThisValue(input.getThisQuantityDTO().getValue());
         entity.setThisUnit(input.getThisQuantityDTO().getUnit());
@@ -32,7 +32,7 @@ public class QuantityMeasurementServiceImpl implements IQuantityMeasurementServi
         entity.setErrorMessage(null);
     }
 
-    // ================= CONVERSION =================
+    // CONVERSION 
     private double convertToBase(double value, String unit, String type) {
         switch (type) {
             case "LengthUnit":
@@ -72,13 +72,13 @@ public class QuantityMeasurementServiceImpl implements IQuantityMeasurementServi
         }
     }
 
-    // ================= COMPARE =================
+    // COMPARE
     @Override
     public QuantityMeasurementEntity compare(QuantityInputDTO input) {
         validateType(input);
 
         QuantityMeasurementEntity entity = new QuantityMeasurementEntity();
-        setCommonFields(entity, input); // IMPORTANT
+        setCommonFields(entity, input);
 
         String type = input.getThisQuantityDTO().getMeasurementType();
 
@@ -102,7 +102,7 @@ public class QuantityMeasurementServiceImpl implements IQuantityMeasurementServi
         return repository.save(entity);
     }
 
-    // ================= CONVERT =================
+    // CONVERT
     @Override
     public QuantityMeasurementEntity convert(QuantityInputDTO input) {
         validateType(input);
@@ -125,12 +125,12 @@ public class QuantityMeasurementServiceImpl implements IQuantityMeasurementServi
         return repository.save(entity);
     }
 
-    // ================= ARITHMETIC =================
+    //ARITHMETIC
     private QuantityMeasurementEntity performArithmetic(QuantityInputDTO input, String operation) {
         validateType(input);
 
         QuantityMeasurementEntity entity = new QuantityMeasurementEntity();
-        setCommonFields(entity, input); // IMPORTANT
+        setCommonFields(entity, input); 
 
         String type = input.getThisQuantityDTO().getMeasurementType();
         String resultUnit = input.getThisQuantityDTO().getUnit();
@@ -205,13 +205,13 @@ public class QuantityMeasurementServiceImpl implements IQuantityMeasurementServi
         return performArithmetic(input, "DIVIDE");
     }
 
-    // ================= HISTORY =================
+    // HISTORY 
     @Override
     public List<QuantityMeasurementEntity> getHistoryByOperation(String operation) {
         return repository.findByOperation(operation);
     }
 
-    // ================= COUNT =================
+    // COUNT
     @Override
     public long getOperationCount(String operation) {
         return repository.countByOperationAndErrorFalse(operation);
